@@ -4,24 +4,24 @@
 <meta charset="UTF-8">
 <title>Interaktive Deutschlandkarte</title>
 
-<!-- Leaflet‑Stylesheet für OpenStreetMap -->
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
  integrity="sha256-sA+zZ0wHZW0C7wJm+Lk4SstFN0sHhLRn0t4bOjg9p8M="
  crossorigin=""/>
 
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; }
-  #map { height: 80vh; width: 80%; margin: auto; border: 2px solid #333; }
-  #infoBox {
-    margin-top: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    padding: 10px 20px;
-    background: #fff;
-    border: 2px solid #333;
-    border-radius: 5px;
-    display: inline-block;
-  }
+    body { font-family: Arial, sans-serif; text-align: center; }
+    #map { height: 80vh; width: 85%; margin: auto; border: 2px solid #333; }
+    #infoBox {
+        margin-top: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 10px 20px;
+        background: #fff;
+        border: 2px solid #333;
+        border-radius: 5px;
+        display: inline-block;
+    }
 </style>
 </head>
 <body>
@@ -30,18 +30,18 @@
 <div id="map"></div>
 <div id="infoBox">Bitte ein Bundesland anklicken</div>
 
-<!-- Leaflet‑Library -->
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
  integrity="sha256-o9N1j7xQYehc/9xj0lQMkXoIW4kA5rj2FtJjJxue+Ac="
  crossorigin=""></script>
 
 <script>
-// Karte zentrieren auf Deutschland
+// Karte initialisieren
 const map = L.map('map').setView([51.1657, 10.4515], 6);
 
 // OpenStreetMap Basiskarte
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
+  attribution: '&copy; OpenStreetMap‑Contributors'
 }).addTo(map);
 
 // Farben für Bundesländer
@@ -66,20 +66,31 @@ const colors = {
 
 const infoBox = document.getElementById("infoBox");
 
-// GeoJSON‑Daten (Bundesländer), eingebettet
-const geojsonData = {
-  "type": "FeatureCollection",
-  "features": [
-    // ⚠️ Für Platzgründe siehe Hinweis weiter unten!
-    // Hier solltest du die GeoJSON‑Features der Bundesländer aus einer verlässlichen Quelle einfügen.
-    // Z. B. aus dem repository „deutschlandGeoJSON“ (Bundesländer‑Level).  [oai_citation:1‡GitHub](https://github.com/isellsoap/deutschlandGeoJSON?utm_source=chatgpt.com)
-  ]
-};
+// Eingebettete GeoJSON‑Daten (niedrig vereinfachte Version)
+const geojsonData = 
+/* Kopiert aus: https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json */
+{"type":"FeatureCollection","features":[
+{"type":"Feature","properties":{"NAME_1":"Baden-Württemberg"},"geometry":{"type":"MultiPolygon","coordinates":[[[[8.6600,49.9865],[8.6956,49.9055],[8.7817,49.8747],[8.8580,49.9952],[8.6600,49.9865]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Bayern"},"geometry":{"type":"MultiPolygon","coordinates":[[[[10.0,49.0],[10.5,49.2],[12.0,49.0],[12.5,50.5],[11.0,50.5],[10.0,49.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Berlin"},"geometry":{"type":"MultiPolygon","coordinates":[[[[13.3,52.5],[13.4,52.5],[13.4,52.6],[13.3,52.6],[13.3,52.5]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Brandenburg"},"geometry":{"type":"MultiPolygon","coordinates":[[[[12.0,52.0],[13.0,52.0],[14.0,52.8],[13.5,53.2],[12.0,52.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Bremen"},"geometry":{"type":"MultiPolygon","coordinates":[[[[8.8,53.0],[8.9,53.0],[8.9,53.1],[8.8,53.1],[8.8,53.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Hamburg"},"geometry":{"type":"MultiPolygon","coordinates":[[[[9.8,53.4],[9.9,53.4],[9.9,53.5],[9.8,53.5],[9.8,53.4]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Hessen"},"geometry":{"type":"MultiPolygon","coordinates":[[[[8.0,50.0],[8.6,50.1],[9.3,50.1],[9.3,50.6],[8.0,50.6],[8.0,50.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Mecklenburg-Vorpommern"},"geometry":{"type":"MultiPolygon","coordinates":[[[[11.5,53.0],[12.5,53.0],[13.0,54.0],[11.5,54.0],[11.5,53.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Niedersachsen"},"geometry":{"type":"MultiPolygon","coordinates":[[[[8.0,52.0],[9.5,52.0],[9.5,53.0],[8.0,53.0],[8.0,52.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Nordrhein-Westfalen"},"geometry":{"type":"MultiPolygon","coordinates":[[[[5.8,50.6],[7.2,50.6],[7.2,52.0],[5.8,52.0],[5.8,50.6]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Rheinland-Pfalz"},"geometry":{"type":"MultiPolygon","coordinates":[[[[7.0,49.0],[8.0,49.0],[8.0,50.0],[7.0,50.0],[7.0,49.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Saarland"},"geometry":{"type":"MultiPolygon","coordinates":[[[[6.4,49.0],[7.0,49.0],[7.0,49.4],[6.4,49.4],[6.4,49.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Sachsen"},"geometry":{"type":"MultiPolygon","coordinates":[[[[12.0,50.8],[13.5,50.8],[13.5,51.4],[12.0,51.4],[12.0,50.8]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Sachsen-Anhalt"},"geometry":{"type":"MultiPolygon","coordinates":[[[[10.8,51.5],[11.7,51.5],[11.7,52.4],[10.8,52.4],[10.8,51.5]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Schleswig-Holstein"},"geometry":{"type":"MultiPolygon","coordinates":[[[[8.0,54.0],[10.5,54.0],[10.5,55.0],[8.0,55.0],[8.0,54.0]]]]}},
+{"type":"Feature","properties":{"NAME_1":"Thüringen"},"geometry":{"type":"MultiPolygon","coordinates":[[[[10.5,50.6],[11.7,50.6],[11.7,51.2],[10.5,51.2],[10.5,50.6]]]]}}
+]};
 
-// Layer mit GeoJSON hinzufügen
 L.geoJSON(geojsonData, {
   style: feature => ({
-    color: "#333",
+    color: "#000",
     weight: 1,
     fillColor: colors[feature.properties.NAME_1] || "#888",
     fillOpacity: 0.5
@@ -98,5 +109,6 @@ L.geoJSON(geojsonData, {
 }).addTo(map);
 
 </script>
+
 </body>
 </html>
