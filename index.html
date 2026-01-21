@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Interaktive Deutschlandkarte</title>
+<title>Interaktive Deutschlandkarte (Externe SVG)</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,9 +11,9 @@
     }
     svg path {
         cursor: pointer;
+        fill-opacity: 0.5;
         stroke: #333;
         stroke-width: 0.8;
-        fill-opacity: 0.5;
         transition: fill-opacity 0.2s, stroke-width 0.2s;
     }
     svg path:hover {
@@ -36,53 +36,53 @@
 
 <h1>Interaktive Deutschlandkarte</h1>
 
-<!-- Echte Deutschlandkarte (SVG Bundesländer) -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="70%">
-
-    <!-- Beispiel SVG‑Pfaddaten: echte Grenzen (vereinfacht) -->
-    <!-- Diese SVG stammt aus frei verfügbaren Kartendaten für Deutschland mit Bundesländern -->
-    <!-- Download‑Quelle / Basisinformationen: simplemaps.com freie Deutschland‑SVG Karte mit Bundesländern.  [oai_citation:1‡simplemaps.com](https://simplemaps.com/svg/country/de?utm_source=chatgpt.com) -->
-
-    <path id="Schleswig-Holstein" fill="#e41a1c" d="M..."/>
-    <path id="Hamburg" fill="#377eb8" d="M..."/>
-    <path id="Mecklenburg-Vorpommern" fill="#4daf4a" d="M..."/>
-    <path id="Niedersachsen" fill="#984ea3" d="M..."/>
-    <path id="Bremen" fill="#ff7f00" d="M..."/>
-    <path id="Brandenburg" fill="#ffff33" d="M..."/>
-    <path id="Berlin" fill="#a65628" d="M..."/>
-    <path id="Sachsen-Anhalt" fill="#f781bf" d="M..."/>
-    <path id="Nordrhein-Westfalen" fill="#999999" d="M..."/>
-    <path id="Hessen" fill="#66c2a5" d="M..."/>
-    <path id="Rheinland-Pfalz" fill="#fc8d62" d="M..."/>
-    <path id="Saarland" fill="#8da0cb" d="M..."/>
-    <path id="Baden-Württemberg" fill="#ffd92f" d="M..."/>
-    <path id="Bayern" fill="#e78ac3" d="M..."/>
-    <path id="Sachsen" fill="#a6cee3" d="M..."/>
-    <path id="Thüringen" fill="#b3de69" d="M..."/>
-
-</svg>
+<!-- Container für die externe SVG -->
+<div id="mapContainer"></div>
 
 <div id="infoBox">Bitte ein Bundesland anklicken</div>
 
 <script>
-    const paths = document.querySelectorAll("svg path");
-    const infoBox = document.getElementById("infoBox");
+const mapContainer = document.getElementById("mapContainer");
+const infoBox = document.getElementById("infoBox");
 
-    // Highlight bei Klick
-    paths.forEach(path => {
+// Externe SVG laden (von Wikimedia Commons: Deutschlandkarte mit Bundesländern)
+fetch("https://upload.wikimedia.org/wikipedia/commons/2/2f/Karte_Deutschland.svg")
+  .then(response => response.text())
+  .then(svgText => {
+    mapContainer.innerHTML = svgText;
+
+    // Nach dem Einfügen alle Pfade selektieren
+    const paths = mapContainer.querySelectorAll("path, polygon, polyline");
+
+    // Originalfarben speichern
+    paths.forEach((path, i) => {
+        // Jede Farbe zufällig für Sichtbarkeit
+        path.dataset.originalColor = path.getAttribute("fill") || `hsl(${i*20},70%,50%)`;
+        path.setAttribute("fill", path.dataset.originalColor);
+        path.setAttribute("fill-opacity", "0.5");
+
+        // Klick-Event
         path.addEventListener("click", () => {
-            // Reset vorheriger Highlights
+            // Alle auf Originalfarbe zurücksetzen
             paths.forEach(p => {
-                p.style.strokeWidth = "0.8";
-                p.style.fillOpacity = "0.5";
+                p.setAttribute("fill", p.dataset.originalColor);
+                p.setAttribute("fill-opacity", "0.5");
             });
-            // Markiert angeklicktes Bundesland
-            path.style.strokeWidth = "2";
-            path.style.fillOpacity = "1.0";
-            // Text aktualisieren
-            infoBox.textContent = path.id;
+
+            // Angeclicktes Bundesland hervorheben
+            path.setAttribute("fill", path.dataset.originalColor);
+            path.setAttribute("fill-opacity", "1");
+
+            // Name anzeigen (aus id oder title)
+            const name = path.id || path.getAttribute("title") || "Bundesland";
+            infoBox.textContent = name;
         });
     });
+  })
+  .catch(err => {
+    mapContainer.textContent = "Die Karte konnte nicht geladen werden.";
+    console.error(err);
+  });
 </script>
 
 </body>
