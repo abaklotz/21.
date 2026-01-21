@@ -2,85 +2,93 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Interaktive Deutschlandkarte (Externe SVG)</title>
+<title>Interaktive Deutschlandkarte mit OpenStreetMap</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ integrity="sha256-sA+zZ0wHZW0C7wJm+Lk4SstFN0sHhLRn0t4bOjg9p8M="
+ crossorigin=""/>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background: #f7f7f7;
-    }
-    svg path {
-        cursor: pointer;
-        fill-opacity: 0.5;
-        stroke: #333;
-        stroke-width: 0.8;
-        transition: fill-opacity 0.2s, stroke-width 0.2s;
-    }
-    svg path:hover {
-        fill-opacity: 0.8;
-        stroke-width: 1.5;
-    }
-    #infoBox {
-        margin-top: 20px;
-        font-size: 24px;
-        font-weight: bold;
-        padding: 10px 20px;
-        background: #fff;
-        border: 2px solid #333;
-        border-radius: 5px;
-        display: inline-block;
-    }
+  #map { height: 80vh; width: 80%; margin: auto; }
+  body { font-family: Arial, sans-serif; text-align: center; }
+  #infoBox {
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 10px 20px;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 5px;
+    display: inline-block;
+  }
 </style>
 </head>
 <body>
 
 <h1>Interaktive Deutschlandkarte</h1>
 
-<!-- Container für die externe SVG -->
-<div id="mapContainer"></div>
-
+<div id="map"></div>
 <div id="infoBox">Bitte ein Bundesland anklicken</div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+ integrity="sha256-o9N1j7xQYehc/9xj0lQMkXoIW4kA5rj2FtJjJxue+Ac="
+ crossorigin=""></script>
+
 <script>
-const mapContainer = document.getElementById("mapContainer");
+// Karte zentrieren auf Deutschland
+const map = L.map('map').setView([51.1657, 10.4515], 6);
+
+// OSM Basiskarte hinzufügen
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// Farbe pro Bundesland
+const colors = {
+  "Schleswig-Holstein": "#1f78b4",
+  "Hamburg": "#33a02c",
+  "Niedersachsen": "#e31a1c",
+  "Bremen": "#ff7f00",
+  "Nordrhein-Westfalen": "#6a3d9a",
+  "Hessen": "#b15928",
+  "Rheinland-Pfalz": "#a6cee3",
+  "Saarland": "#fb9a99",
+  "Baden-Württemberg": "#fdbf6f",
+  "Bayern": "#cab2d6",
+  "Berlin": "#ffff99",
+  "Brandenburg": "#b2df8a",
+  "Mecklenburg-Vorpommern": "#8dd3c7",
+  "Sachsen": "#ffffb3",
+  "Sachsen-Anhalt": "#fccde5",
+  "Thüringen": "#d9d9d9"
+};
+
 const infoBox = document.getElementById("infoBox");
 
-// Externe SVG laden (von Wikimedia Commons: Deutschlandkarte mit Bundesländern)
-fetch("https://upload.wikimedia.org/wikipedia/commons/2/2f/Karte_Deutschland.svg")
-  .then(response => response.text())
-  .then(svgText => {
-    mapContainer.innerHTML = svgText;
-
-    // Nach dem Einfügen alle Pfade selektieren
-    const paths = mapContainer.querySelectorAll("path, polygon, polyline");
-
-    // Originalfarben speichern
-    paths.forEach((path, i) => {
-        // Jede Farbe zufällig für Sichtbarkeit
-        path.dataset.originalColor = path.getAttribute("fill") || `hsl(${i*20},70%,50%)`;
-        path.setAttribute("fill", path.dataset.originalColor);
-        path.setAttribute("fill-opacity", "0.5");
-
-        // Klick-Event
-        path.addEventListener("click", () => {
-            // Alle auf Originalfarbe zurücksetzen
-            paths.forEach(p => {
-                p.setAttribute("fill", p.dataset.originalColor);
-                p.setAttribute("fill-opacity", "0.5");
-            });
-
-            // Angeclicktes Bundesland hervorheben
-            path.setAttribute("fill", path.dataset.originalColor);
-            path.setAttribute("fill-opacity", "1");
-
-            // Name anzeigen (aus id oder title)
-            const name = path.id || path.getAttribute("title") || "Bundesland";
-            infoBox.textContent = name;
+// Bundesländer‑GeoJSON laden
+fetch('https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_bundeslaender.geojson')
+  .then(res => res.json())
+  .then(geojson => {
+    L.geoJSON(geojson, {
+      style: feature => ({
+        color: "#000",
+        weight: 1,
+        fillColor: colors[feature.properties.NAME_1] || "#888",
+        fillOpacity: 0.5
+      }),
+      onEachFeature: (feature, layer) => {
+        layer.on({
+          click: () => {
+            infoBox.textContent = feature.properties.NAME_1;
+            layer.setStyle({ fillOpacity: 1 });
+          },
+          mouseout: () => {
+            layer.setStyle({ fillOpacity: 0.5 });
+          }
         });
-    });
+      }
+    }).addTo(map);
   })
   .catch(err => {
-    mapContainer.textContent = "Die Karte konnte nicht geladen werden.";
+    infoBox.textContent = "Fehler beim Laden der Bundesländer‑Daten";
     console.error(err);
   });
 </script>
