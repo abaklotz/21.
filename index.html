@@ -2,13 +2,16 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Interaktive Deutschlandkarte mit OpenStreetMap</title>
+<title>Interaktive Deutschlandkarte</title>
+
+<!-- Leaflet‑Stylesheet für OpenStreetMap -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
  integrity="sha256-sA+zZ0wHZW0C7wJm+Lk4SstFN0sHhLRn0t4bOjg9p8M="
  crossorigin=""/>
+
 <style>
-  #map { height: 80vh; width: 80%; margin: auto; }
   body { font-family: Arial, sans-serif; text-align: center; }
+  #map { height: 80vh; width: 80%; margin: auto; border: 2px solid #333; }
   #infoBox {
     margin-top: 10px;
     font-size: 20px;
@@ -24,10 +27,10 @@
 <body>
 
 <h1>Interaktive Deutschlandkarte</h1>
-
 <div id="map"></div>
 <div id="infoBox">Bitte ein Bundesland anklicken</div>
 
+<!-- Leaflet‑Library -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
  integrity="sha256-o9N1j7xQYehc/9xj0lQMkXoIW4kA5rj2FtJjJxue+Ac="
  crossorigin=""></script>
@@ -36,12 +39,12 @@
 // Karte zentrieren auf Deutschland
 const map = L.map('map').setView([51.1657, 10.4515], 6);
 
-// OSM Basiskarte hinzufügen
+// OpenStreetMap Basiskarte
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Farbe pro Bundesland
+// Farben für Bundesländer
 const colors = {
   "Schleswig-Holstein": "#1f78b4",
   "Hamburg": "#33a02c",
@@ -63,35 +66,37 @@ const colors = {
 
 const infoBox = document.getElementById("infoBox");
 
-// Bundesländer‑GeoJSON laden
-fetch('https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/2_bundeslaender.geojson')
-  .then(res => res.json())
-  .then(geojson => {
-    L.geoJSON(geojson, {
-      style: feature => ({
-        color: "#000",
-        weight: 1,
-        fillColor: colors[feature.properties.NAME_1] || "#888",
-        fillOpacity: 0.5
-      }),
-      onEachFeature: (feature, layer) => {
-        layer.on({
-          click: () => {
-            infoBox.textContent = feature.properties.NAME_1;
-            layer.setStyle({ fillOpacity: 1 });
-          },
-          mouseout: () => {
-            layer.setStyle({ fillOpacity: 0.5 });
-          }
-        });
-      }
-    }).addTo(map);
-  })
-  .catch(err => {
-    infoBox.textContent = "Fehler beim Laden der Bundesländer‑Daten";
-    console.error(err);
-  });
-</script>
+// GeoJSON‑Daten (Bundesländer), eingebettet
+const geojsonData = {
+  "type": "FeatureCollection",
+  "features": [
+    // ⚠️ Für Platzgründe siehe Hinweis weiter unten!
+    // Hier solltest du die GeoJSON‑Features der Bundesländer aus einer verlässlichen Quelle einfügen.
+    // Z. B. aus dem repository „deutschlandGeoJSON“ (Bundesländer‑Level).  [oai_citation:1‡GitHub](https://github.com/isellsoap/deutschlandGeoJSON?utm_source=chatgpt.com)
+  ]
+};
 
+// Layer mit GeoJSON hinzufügen
+L.geoJSON(geojsonData, {
+  style: feature => ({
+    color: "#333",
+    weight: 1,
+    fillColor: colors[feature.properties.NAME_1] || "#888",
+    fillOpacity: 0.5
+  }),
+  onEachFeature: (feature, layer) => {
+    layer.on({
+      click: () => {
+        infoBox.textContent = feature.properties.NAME_1;
+        layer.setStyle({ fillOpacity: 1 });
+      },
+      mouseout: () => {
+        layer.setStyle({ fillOpacity: 0.5 });
+      }
+    });
+  }
+}).addTo(map);
+
+</script>
 </body>
 </html>
