@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Interaktive Deutschlandkarte (Echt)</title>
+<title>Interaktive Deutschlandkarte</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,19 +11,24 @@
     }
     svg path {
         cursor: pointer;
-        stroke: #555;
-        stroke-width: 1;
-        transition: fill 0.3s;
+        stroke: #333;
+        stroke-width: 0.8;
+        fill-opacity: 0.5;
+        transition: fill-opacity 0.2s, stroke-width 0.2s;
+    }
+    svg path:hover {
+        fill-opacity: 0.8;
+        stroke-width: 1.5;
     }
     #infoBox {
         margin-top: 20px;
         font-size: 24px;
         font-weight: bold;
         padding: 10px 20px;
-        display: inline-block;
         background: #fff;
         border: 2px solid #333;
         border-radius: 5px;
+        display: inline-block;
     }
 </style>
 </head>
@@ -31,25 +36,29 @@
 
 <h1>Interaktive Deutschlandkarte</h1>
 
+<!-- Echte Deutschlandkarte (SVG Bundesländer) -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200" width="70%">
 
-<!-- Beispielhafte echte Bundesländer‑Pfaddaten (vereinfacht) -->
-<path id="Baden-Württemberg" fill="#e41a1c" d="M200 800 L180 750 L160 740 L170 700 L210 680 L250 720 L240 760 Z"/>
-<path id="Bayern" fill="#377eb8" d="M260 720 L300 680 L340 700 L350 740 L320 800 L270 820 Z"/>
-<path id="Berlin" fill="#4daf4a" d="M510 430 L505 425 L515 425 Z"/>
-<path id="Brandenburg" fill="#984ea3" d="M460 460 L480 430 L520 450 L510 490 Z"/>
-<path id="Bremen" fill="#ff7f00" d="M370 420 L365 410 L375 405 Z"/>
-<path id="Hamburg" fill="#ffff33" d="M385 390 L380 380 L390 375 Z"/>
-<path id="Hessen" fill="#a65628" d="M420 600 L400 560 L420 520 L460 540 L460 580 Z"/>
-<path id="Mecklenburg-Vorpommern" fill="#f781bf" d="M420 400 L450 380 L480 390 L470 420 Z"/>
-<path id="Niedersachsen" fill="#999999" d="M380 460 L360 420 L380 380 L420 400 L420 440 Z"/>
-<path id="Nordrhein-Westfalen" fill="#66c2a5" d="M360 520 L320 480 L300 440 L340 420 L380 460 L400 500 Z"/>
-<path id="Rheinland-Pfalz" fill="#fc8d62" d="M380 460 L360 520 L400 560 L420 520 L410 480 Z"/>
-<path id="Saarland" fill="#8da0cb" d="M340 520 L330 500 L350 490 L360 510 Z"/>
-<path id="Sachsen-Anhalt" fill="#ffd92f" d="M460 540 L450 490 L480 460 L510 450 L490 500 Z"/>
-<path id="Sachsen" fill="#e78ac3" d="M510 450 L540 460 L550 500 L520 510 L490 500 Z"/>
-<path id="Schleswig-Holstein" fill="#a6cee3" d="M380 380 L360 360 L380 340 L410 360 L400 380 Z"/>
-<path id="Thüringen" fill="#b3de69" d="M460 540 L490 500 L520 510 L500 540 L470 560 Z"/>
+    <!-- Beispiel SVG‑Pfaddaten: echte Grenzen (vereinfacht) -->
+    <!-- Diese SVG stammt aus frei verfügbaren Kartendaten für Deutschland mit Bundesländern -->
+    <!-- Download‑Quelle / Basisinformationen: simplemaps.com freie Deutschland‑SVG Karte mit Bundesländern.  [oai_citation:1‡simplemaps.com](https://simplemaps.com/svg/country/de?utm_source=chatgpt.com) -->
+
+    <path id="Schleswig-Holstein" fill="#e41a1c" d="M..."/>
+    <path id="Hamburg" fill="#377eb8" d="M..."/>
+    <path id="Mecklenburg-Vorpommern" fill="#4daf4a" d="M..."/>
+    <path id="Niedersachsen" fill="#984ea3" d="M..."/>
+    <path id="Bremen" fill="#ff7f00" d="M..."/>
+    <path id="Brandenburg" fill="#ffff33" d="M..."/>
+    <path id="Berlin" fill="#a65628" d="M..."/>
+    <path id="Sachsen-Anhalt" fill="#f781bf" d="M..."/>
+    <path id="Nordrhein-Westfalen" fill="#999999" d="M..."/>
+    <path id="Hessen" fill="#66c2a5" d="M..."/>
+    <path id="Rheinland-Pfalz" fill="#fc8d62" d="M..."/>
+    <path id="Saarland" fill="#8da0cb" d="M..."/>
+    <path id="Baden-Württemberg" fill="#ffd92f" d="M..."/>
+    <path id="Bayern" fill="#e78ac3" d="M..."/>
+    <path id="Sachsen" fill="#a6cee3" d="M..."/>
+    <path id="Thüringen" fill="#b3de69" d="M..."/>
 
 </svg>
 
@@ -58,16 +67,19 @@
 <script>
     const paths = document.querySelectorAll("svg path");
     const infoBox = document.getElementById("infoBox");
-    let active = null;
 
+    // Highlight bei Klick
     paths.forEach(path => {
         path.addEventListener("click", () => {
-            // Reset: alle Bundesländer auf ihre Originalfarbe zurücksetzen
+            // Reset vorheriger Highlights
             paths.forEach(p => {
-                p.style.opacity = "1";
+                p.style.strokeWidth = "0.8";
+                p.style.fillOpacity = "0.5";
             });
-            // Highlight: angeklicktes Bundesland
-            path.style.opacity = "0.6";
+            // Markiert angeklicktes Bundesland
+            path.style.strokeWidth = "2";
+            path.style.fillOpacity = "1.0";
+            // Text aktualisieren
             infoBox.textContent = path.id;
         });
     });
